@@ -37,3 +37,32 @@ jobs:
     inputs: 
       artifactName: blackbox-log-viewer-windows
       targetPath: '$(System.DefaultWorkingDirectory)/release'
+
+- job: 'MacOS'
+
+  pool:
+    vmImage: 'macos-10.13'
+
+  steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '8.11.2'    
+    displayName: 'Install Node.js'
+
+  - script: npm install -g npm@6.0.1
+    displayName: 'Install NPM'
+
+  - script: npm install -g gulp
+    displayName: 'Install Gulp'
+
+  - script: npm install
+    displayName: 'Run rpm install'
+
+  - script: gulp release --osx64
+    displayName: 'Run gulp release'
+
+  - task: PublishPipelineArtifact@0
+    displayName: 'Publish MacOS release'
+    inputs: 
+      artifactName: blackbox-log-viewer-macos
+      targetPath: '$(System.DefaultWorkingDirectory)/release'
