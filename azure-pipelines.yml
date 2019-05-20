@@ -1,0 +1,39 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+- master
+
+jobs:
+- job: 'Windows'
+
+  pool:
+    vmImage: 'vs2017-win2016'
+
+  steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '8.11.2'    
+    displayName: 'Install Node.js'
+
+  - script: npm install -g npm@6.0.1
+    displayName: 'Install NPM'
+
+  - script: npm install -g gulp
+    displayName: 'Install Gulp'
+
+  - script: npm install
+    displayName: 'Run npm install'
+
+  - script: gulp release --win32 --win64
+    displayName: 'Run gulp release'
+
+  - powershell: Set-Content -Path '$(System.DefaultWorkingDirectory)/release/log.txt' -Value $env:BUILD_SOURCEVERSIONMESSAGE
+
+  - task: PublishPipelineArtifact@0
+    displayName: 'Publish Windows release'
+    inputs: 
+      artifactName: blackbox-log-viewer-windows
+      targetPath: '$(System.DefaultWorkingDirectory)/release'
